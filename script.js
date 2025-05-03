@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 // Your Firebase configuration
@@ -64,15 +64,18 @@ onAuthStateChanged(auth, (user) => {
         signOutBtn.style.display = 'block';
         bookingForm.style.display = 'block';
         emailInput.value = user.email || "Not provided";
+        fetchPastAppointments(user.uid); // Fetch past appointments when user signs in
     } else {
         userStatus.textContent = 'Not signed in';
         googleSignInBtn.style.display = 'block';
         signOutBtn.style.display = 'none';
         bookingForm.style.display = 'none';
         emailInput.value = '';
+        document.getElementById('appointment-list').innerHTML = ''; // Clear past appointments
     }
 });
 
+const dateSelect = document.getElementById('dateSelect');
 const dateInput = document.getElementById('appointmentDate');
 const timeSlot = document.getElementById('time-slot');
 const timeInput = document.getElementById('appointmentTime');
@@ -98,19 +101,53 @@ const maxDateStr = maxDate.toISOString().split('T')[0];
 dateInput.min = today;
 dateInput.max = maxDateStr;
 
-// Function to update time slots based on selected date
-function updateTimeSlots() {
-    const selectedDate = dateInput.value;
+// Function to format the date for display (e.g., "2025-05-02" to "May 2, 2025")
+function formatDateForDisplay(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+// Function to update date and time slots
+function updateDateAndTimeSlots() {
+    const selectedValue = dateSelect.value;
     const now = getCurrentTimeInIST();
     const currentHour = now.getHours();
     const currentMinutes = now.getMinutes();
 
+    // Handle date selection based on dropdown
+    if (selectedValue === 'today') {
+        dateInput.value = today;
+        dateInput.style.display = 'none';
+    } else if (selectedValue === 'tomorrow') {
+        const tomorrow = new Date(nowIST);
+        tomorrow.setDate(nowIST.getDate() + 1);
+        dateInput.value = tomorrow.toISOString().split('T')[0];
+        dateInput.style.display = 'none';
+    } else if (selectedValue === 'calendar' && !dateInput.value) {
+        dateInput.style.display = 'block';
+        dateInput.focus();
+        timeSlot.style.display = 'none'; // Hide time slots until a date is selected
+        console.log("Opened calendar picker");
+        return;
+    }
+
+    // Use the date from dateInput as the source of truth
+    const selectedDate = dateInput.value;
+
     console.log("Selected date:", selectedDate);
     console.log("Today:", today);
 
-    // If a date is selected, update time slots
+    // If a date is selected, update time slots and display the date in the dropdown
     if (selectedDate && selectedDate >= today) {
         console.log("Date is valid, updating time slots...");
+
+        // Update the dropdown to show the selected date
+        dateSelect.innerHTML = `
+            <option value="${selectedValue === 'today' || selectedValue === 'tomorrow' ? selectedValue : selectedDate}" selected>${selectedValue === 'today' ? 'Today' : selectedValue === 'tomorrow' ? 'Tomorrow' : formatDateForDisplay(selectedDate)}</option>
+            <option value="today">Today</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="calendar">Calendar</option>
+        `;
 
         // Calculate the earliest allowed hour (at least 1 hour from now, rounded to the next slot)
         let earliestHour = currentHour + 1;
@@ -150,14 +187,52 @@ function updateTimeSlots() {
     return selectedDate;
 }
 
-// Handle date input change
+// Handle dropdown change
+dateSelect.addEventListener('change', () => {
+    console.log("Date select changed:", dateSelect.value);
+    updateDateAndTimeSlots();
+});
+
+// Handle calendar input change (if user selects a date from the calendar)
 dateInput.addEventListener('change', () => {
-    console.log("Date selected:", dateInput.value);
-    updateTimeSlots();
+    console.log("Calendar date selected:", dateInput.value);
+    dateInput.style.display = 'none';
+    if (dateInput.value) {
+        updateDateAndTimeSlots();
+    }
 });
 
 // Initial update
-updateTimeSlots();
+updateDateAndTimeSlots();
+
+// Function to fetch and display past appointments
+async function fetchPastAppointments(userId) {
+    const appointmentList = document.getElementById('appointment-list');
+    appointmentList.innerHTML = ''; // Clear existing list
+
+    try {
+        const q = query(
+            collection(db, 'appointments'),
+            where('userId', '==', userId),
+            orderBy('timestamp', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            appointmentList.innerHTML = '<li>No past appointments found.</li>';
+            return;
+        }
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const li = document.createElement('li');
+            li.textContent = `${data.service} on ${data.date} at ${data.time}`;
+            appointmentList.appendChild(li);
+        });
+    } catch (error) {
+        console.error("Error fetching past appointments:", error);
+        appointmentList.innerHTML = '<li>Error loading past appointments.</li>';
+    }
+}
 
 // Handle form submission with validation
 document.getElementById('booking-form').addEventListener('submit', async (e) => {
@@ -222,7 +297,14 @@ document.getElementById('booking-form').addEventListener('submit', async (e) => 
         document.getElementById('booking-form').reset();
         timeSlot.style.display = 'none';
         emailInput.value = user.email || "Not provided";
-        updateTimeSlots(); // Reset time slots after submission
+        dateSelect.innerHTML = `
+            <option value="" selected disabled>Select Date</option>
+            <option value="today">Today</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="calendar">Calendar</option>
+        `;
+        updateDateAndTimeSlots(); // Reset date and time slots after submission
+        fetchPastAppointments(user.uid); // Refresh past appointments
     } catch (error) {
         console.error("Submission error:", error);
         alert('Error booking appointment: ' + error.message);

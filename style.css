@@ -54,6 +54,11 @@ h2 {
     margin-bottom: 1rem;
     color: #66ffcc; /* Highlight Mint Green */
 }
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #66ffcc; /* Highlight Mint Green */
+}
 .service-grid, .gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -95,13 +100,6 @@ label {
     background-color: #0d1b16;
     color: #d4e4da;
 }
-#appointmentDate {
-    appearance: none; /* Remove default styling in some browsers */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    padding-right: 25px; /* Space for the arrow */
-}
 #time-slot {
     display: none;
     margin-top: 10px;
@@ -140,6 +138,13 @@ button#googleSignInBtn:hover {
 #signOutBtn:hover {
     background-color: #5a6268; /* Slightly darker on hover */
 }
+#dateSelect {
+    appearance: none; /* Remove default arrow in some browsers */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 25px; /* Space for the arrow */
+}
 #book button {
     background-color: #66ffcc; /* Mint Button */
     color: #0d1b16; /* Deep Greenish Black Text */
@@ -152,6 +157,22 @@ button#googleSignInBtn:hover {
 }
 #book button:hover {
     background-color: #4ddbb1; /* Deeper Mint on Hover */
+}
+#past-appointments {
+    margin-top: 20px;
+    background: #1b2b22;
+    padding: 1rem;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+#appointment-list {
+    list-style: none;
+    padding: 0;
+}
+#appointment-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #66ffcc;
 }
 #contact p {
     font-size: 1rem;

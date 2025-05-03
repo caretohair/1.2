@@ -7,43 +7,6 @@
     <meta name="keywords" content="hair care, mobile hair services, hair massage, hair wash, Hyderabad">
     <title>Mobile Hair Care Hyderabad</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Adding styles for the appointment form and auth section */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input, select, button { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        #time-slot { display: none; margin-top: 10px; }
-        #auth-section { margin-bottom: 20px; }
-        textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-        button#googleSignInBtn { background-color: #4285f4; color: white; border: none; cursor: pointer; width: auto; padding: 5px 10px; }
-        button#googleSignInBtn:hover { background-color: #357abd; }
-
-        /* Style for the Sign-Out button */
-        #signOutBtn {
-            background-color: #6c757d; /* Subtle gray color */
-            color: white;
-            border: none;
-            cursor: pointer;
-            padding: 4px 8px; /* Small padding for less than an inch */
-            font-size: 12px; /* Smaller text */
-            border-radius: 3px; /* Rounded corners */
-            width: auto; /* Allow natural width */
-            margin-left: 10px; /* Space from Sign-In button */
-            display: none; /* Hidden by default */
-        }
-        #signOutBtn:hover {
-            background-color: #5a6268; /* Slightly darker on hover */
-        }
-
-        /* Custom style for date dropdown */
-        #dateSelect {
-            appearance: none; /* Remove default arrow in some browsers */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            padding-right: 25px; /* Space for the arrow */
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -120,13 +83,7 @@
                 </div>
                 <div class="form-group">
                     <label for="appointmentDate">Select Date:</label>
-                    <select id="dateSelect" name="appointmentDate" required>
-                        <option value="" selected disabled>Select Date</option>
-                        <option value="today">Today</option>
-                        <option value="tomorrow">Tomorrow</option>
-                        <option value="calendar">Calendar</option>
-                    </select>
-                    <input type="date" id="appointmentDate" name="appointmentDate" style="display: none;" required>
+                    <input type="date" id="appointmentDate" name="appointmentDate" required>
                 </div>
                 <div class="form-group" id="time-slot">
                     <label for="appointmentTime">Select Time (6:00 AM - 11:00 PM):</label>

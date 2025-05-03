@@ -126,6 +126,7 @@ function updateDateAndTimeSlots() {
     } else if (selectedValue === 'calendar' && !dateInput.value) {
         dateInput.style.display = 'block';
         dateInput.focus();
+        dateInput.click(); // Trigger the native calendar picker
         timeSlot.style.display = 'none'; // Hide time slots until a date is selected
         console.log("Opened calendar picker");
         return;
@@ -293,18 +294,8 @@ document.getElementById('booking-form').addEventListener('submit', async (e) => 
     try {
         console.log("Submitting appointment:", appointmentData);
         await addDoc(collection(db, 'appointments'), appointmentData);
-        alert('Appointment booked successfully!');
-        document.getElementById('booking-form').reset();
-        timeSlot.style.display = 'none';
-        emailInput.value = user.email || "Not provided";
-        dateSelect.innerHTML = `
-            <option value="" selected disabled>Select Date</option>
-            <option value="today">Today</option>
-            <option value="tomorrow">Tomorrow</option>
-            <option value="calendar">Calendar</option>
-        `;
-        updateDateAndTimeSlots(); // Reset date and time slots after submission
-        fetchPastAppointments(user.uid); // Refresh past appointments
+        // Redirect to thank-you page instead of showing alert
+        window.location.href = 'thank-you.html';
     } catch (error) {
         console.error("Submission error:", error);
         alert('Error booking appointment: ' + error.message);
